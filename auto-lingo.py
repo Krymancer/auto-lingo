@@ -11,6 +11,10 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 from selenium.webdriver.chrome.service import Service as ChromeService
 
+def print_debug(*argv):
+    if settings['debug']:
+        print(argv)
+
 
 def set_chrome_options(chrome_options):
     chrome_options.add_argument("--log-level=3")
@@ -180,6 +184,7 @@ def task_options(options):
             pass
 
 def challenge_select():
+    print_debug('challenge select')
     sentence = driver.find_element(By.XPATH,
                                    '//h1[@data-test="challenge-header"]').text
     sentence += " (s)"
@@ -197,13 +202,15 @@ def challenge_select():
         solution = driver.find_element(By.XPATH,
                                        '//div[@class="_1UqAr _1sqiF"]').text
         dictionary[sentence] = solution
-        # print(sentence, '-o->', dictionary[sentence])
+        print_debug(sentence, '-o->', dictionary[sentence])
 
 def challenge_speak_listen():
+    print_debug('challenge speak listen')
     skip = driver.find_element(By.XPATH, '//button[@data-test="player-skip"]')
     skip.click()
 
 def challenge_judge():
+    print_debug('challenge judge')
     sentence = driver.find_element(By.XPATH, '//div[@class="_3-JBe"]').text
     sentence += " (j)"
     if sentence in dictionary:
@@ -220,9 +227,10 @@ def challenge_judge():
         solution = driver.find_element(By.XPATH,
                                        '//div[@class="_1UqAr _1sqiF"]')
         dictionary[sentence] = solution.text
-        # print(sentence, '-s->', dictionary[sentence])
+        print_debug(sentence, '-s->', dictionary[sentence])
 
 def challenge_form():
+    print_debug('challenge form')
     sentence = driver.find_element(By.XPATH,
                                    '//div[@data-test="challenge-form-prompt"]').get_attribute('data-prompt')
     sentence += " (f)"
@@ -240,9 +248,10 @@ def challenge_form():
         solution = driver.find_element(By.XPATH,
                                        '//div[@class="_1UqAr _1sqiF"]')
         dictionary[sentence] = solution.text
-        # print(sentence, '-x->', dictionary[sentence])
+        print_debug(sentence, '-x->', dictionary[sentence])
 
 def challenge_name():
+    print_debug('challenge name')
     sentence = driver.find_element(By.XPATH,
                                    '//h1[@data-test="challenge-header"]').text
     sentence += " (n)"
@@ -266,9 +275,10 @@ def challenge_name():
             solution = solution.split(",")[0]
 
         dictionary[sentence] = solution
-        # print(sentence, '-+->', dictionary[sentence])
+        print_debug(sentence, '-+->', dictionary[sentence])
 
 def challenge_reverse_translation():
+    print_debug('challenge reverse translation')
     sentence = driver.find_element(By.XPATH,
                                    '//span[@data-test="hint-sentence"]').text
     sentence += " (r)"
@@ -308,9 +318,10 @@ def challenge_reverse_translation():
             solution = solution[len(input_text):]
 
         dictionary[sentence] = solution
-        # print(sentence, '--->', dictionary[sentence])
+        print_debug(sentence, '--->', dictionary[sentence])
 
 def challenge_translate():
+    print_debug('challenge translate')
     # static variable for choosing method of splitting tap tokens with apostrophe sign
     if "apostrophe_counter" not in challenge_translate.__dict__:
         challenge_translate.apostrophe_counter = 0
@@ -318,9 +329,17 @@ def challenge_translate():
     if "dash_counter" not in challenge_translate.__dict__:
         challenge_translate.dash_counter = 0
 
-    sentence = driver.find_element(By.XPATH,
-                                   '//span[@data-test="hint-sentence"]').text
+    #sentence = driver.find_element(By.XPATH,'//span[@data-test="hint-sentence"]').text
+    sentence_elements = driver.find_elements(By.XPATH,'//*[@data-test="hint-token"]')
+    sentence = ''
+    for sentence_element in sentence_elements:
+        if(sentence_element.text == ''):
+            sentence += ' '
+        sentence += sentence_element.text
+
+    print(f'Sentence: "{sentence}"')
     sentence += " (t)"
+
     if sentence in dictionary:
         tap_tokens = driver.find_elements(By.XPATH,
                                           '//button[@data-test="challenge-tap-token"]')
@@ -362,13 +381,14 @@ def challenge_translate():
                                    '//button[@data-test="player-skip"]')
         skip.click()
         solution = driver.find_element(By.XPATH,
-                                       '//div[@class="_1UqAr _1sqiF"]').text
+                                       '//div[@class="_1UqAr _3Qruy"]').text
+                                       
         solution = solution.replace(";", "").replace("¿", "").replace("¡", "")
         dictionary[sentence] = solution
-        # print(sentence, '--->', dictionary[sentence])
+        print_debug(sentence, '--->', dictionary[sentence])
 
 def challenge_tap_complete():
-    # print("---> challenge_tap_complete")
+    print_debug("---> challenge_tap_complete")
     sentence_words = driver.find_elements(By.XPATH,
                                           '//span[@data-test="hint-sentence"]')
     sentence = ""
@@ -413,10 +433,10 @@ def challenge_tap_complete():
             solution = solution[len(input_text):]
 
         dictionary[sentence] = solution
-        # print(sentence, '-q->', dictionary[sentence])
+        print_debug(sentence, '-q->', dictionary[sentence])
 
 def challenge_tap():
-    # print("---> challenge_tap")
+    print_debug("---> challenge_tap")
     sentence = driver.find_element(By.XPATH,
                                    '//div[@class="_3NgMa _2Hg6H"]').text
     sentence += " (ta)"
@@ -431,14 +451,14 @@ def challenge_tap():
     else:
         skip = driver.find_element(By.XPATH,
                                    '//button[@data-test="player-skip"]')
-        print(skip.text)
+        #print(skip.text)
         skip.click()
         solution = driver.find_element(By.XPATH,
                                        '//div[@class="_1UqAr _1sqiF"]').text
         solution = solution.replace(".", "").replace("?", "").replace(
             "!", "").replace(";", "").replace(",", "").replace("¿", "")
         dictionary[sentence] = solution
-        # print(sentence, '-ta->', dictionary[sentence])
+        print_debug(sentence, '-ta->', dictionary[sentence])
 
 def challenge_dialogue_readcomp(isDial):
     if isDial:
@@ -462,9 +482,10 @@ def challenge_dialogue_readcomp(isDial):
         solution = driver.find_element(By.XPATH,
                                        '//div[@class="_1UqAr _1sqiF"]')
         dictionary[sentence] = solution.text
-        print(sentence, '-d->', dictionary[sentence])
+        print_debug(sentence, '-d->', dictionary[sentence])
 
 def challenge_gap():
+    print_debug("---> challenge_gap")
     sentence = driver.find_element(By.XPATH,
                                    '//div[@class="_3Fi4A _2Hg6H"]').text
     sentence += " (fg)"
@@ -481,13 +502,13 @@ def challenge_gap():
         solution = driver.find_element(By.XPATH,
                                        '//div[@class="_1UqAr _1sqiF"]')
         dictionary[sentence] = solution.text
-        print(sentence, '-fg->', dictionary[sentence])
+        print_debug(sentence, '-fg->', dictionary[sentence])
 
 def challenge_match():
+    print_debug("---> challenge_match")
 
     tap_tokens = driver.find_elements(By.XPATH,
                                       '//button[@data-test="challenge-tap-token"]')
-
     for token in tap_tokens:
         if token.get_attribute("aria-disabled") != None or token.get_attribute("disabled") != None:
             continue
@@ -584,7 +605,7 @@ def complete_skill(possible_skip_to_lesson=False):
         pass
 
     skill_completed = False
-
+    
     while not skill_completed:
         while True:
             try:
@@ -801,7 +822,8 @@ def learn_bot():
             # search for g tag with grey circle fill
             # cannot search for skills with level < 5 because some skills cap at level 1
             try:
-                g_tag = skill.find_element_by_tag_name('g')
+                # g_tag = skill.find_element_by_tag_name('g')
+                g_tag = skill.find_element(by=By.TAG_NAME, value='g')
             except WebDriverException:
                 continue
 
@@ -850,7 +872,6 @@ def learn_bot():
             action.move_to_element(start_skill).click().perform()
 
             complete_skill(possible_skip_to_lesson)
-
             completed_skill = True
 
             if settings['antifarm_sleep'] > 0:
